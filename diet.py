@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, Flask
+from flask import Flask, render_template, request
 import json
-import os  # 添加，用于检查文件存在
+import os
 
-diet = Blueprint('diet', __name__)
+# 创建全局 Flask 应用（Vercel 必需）
+app = Flask(__name__)
 
-# 食物名称到博客ID的映射（保持不变）
+# 食物名称到博客ID的映射
 food_to_blog_id = {
     "Adzuki Beans": 9,
     "Almond Milk": 10,
@@ -128,53 +129,47 @@ food_to_blog_id = {
     "Zucchini": 128
 }
 
-# 加载 diet.json（添加错误处理）
+# 加载 diet.json（带错误处理）
 json_path = 'data/diet.json'
 if os.path.exists(json_path):
     with open(json_path, 'r', encoding='utf-8') as f:
         diet_data = json.load(f)
 else:
-    diet_data = {}  # 备用空数据，避免崩溃
-    print(f"Warning: {json_path} not found")  # Vercel 日志可见
+    diet_data = {}
+    print(f"Warning: {json_path} not found in {os.getcwd()}")
 
-# Blueprint 路由（保持不变）
-@diet.route('/five-elements-diet', methods=['GET', 'POST'])
-def five_elements_diet():
+# 根路径路由：同时支持 GET（显示表单）和 POST（提交查询）
+@app.route('/', methods=['GET', 'POST'])
+def index():
     result = None
     if request.method == 'POST':
         element = request.form.get('element')
         season = request.form.get('season')
-        
-        # 查找对应季节和体质的食物
+
+        # 查找匹配的饮食建议
         for s in diet_data.get('seasons', []):
-            if s['name'] == season:
-                for t in s['types']:
-                    if t['element'] == element:
+            if s.get('name') == season:
+                for t in s.get('types', []):
+                    if t.get('element') == element:
                         result = {
                             'season': season,
                             'element': element,
-                            'focus': t['focus'],
-                            'principle': s['principle'],
-                            'foods': t['foods']
+                            'focus': t.get('focus'),
+                            'principle': s.get('principle'),
+                            'foods': t.get('foods', [])
                         }
                         break
                 break
-        
+
         if not result:
             result = {"error": "Invalid element or season selected."}
-    
+
     return render_template('diet.html', result=result, food_to_blog_id=food_to_blog_id)
 
-# 创建全局 app 实例（Vercel 需要这个）
-app = Flask(__name__)
-app.register_blueprint(diet)
+# 可选：保留 /five-elements-diet 路径（兼容旧链接）
+@app.route('/five-elements-diet', methods=['GET', 'POST'])
+def five_elements_diet():
+    return index()  # 直接复用上面的逻辑
 
-# 添加根路由（显示初始表单）
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('diet.html', result=None, food_to_blog_id=food_to_blog_id)
-
-# 可选：如果想让 /five-elements-diet 作为默认，重定向根到它
-@app.route('/five-elements-diet', methods=['GET'])
-def redirect_to_diet():
-    return render_template('diet.html', result=None, food_to_blog_id=food_to_blog_id)
+# Vercel 要求：必须暴露 `app` 作为 WSGI 应用
+# （不需要 if __name__ == '__main__' 块）
