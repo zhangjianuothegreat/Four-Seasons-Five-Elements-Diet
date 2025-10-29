@@ -7,10 +7,6 @@
     <meta name="keywords" content="five elements diet, Chinese astrology diet, seasonal eating, healthy eating 2025">
     <title>Five Elements Diet | Your Lucky Compass</title>
 
-    <!-- 移除 Tailwind CDN，全部用内联 CSS -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <!-- <link rel="stylesheet" href="/static/styles.css"> -->
-
     <style>
         /* ====================== 全局变量 & 重置 ====================== */
         :root {
@@ -59,18 +55,14 @@
             pointer-events: none;
         }
 
-        /* 模拟 Tailwind 基础类（避免依赖 CDN） */
         .bg-light { background-color: var(--bg-light); }
         .text-primary { color: var(--primary); }
         .text-secondary { color: var(--secondary); }
         .text-accent1 { color: var(--accent1); }
-        .bg-primary\/5 { background-color: rgba(79, 29, 149, 0.05); }
-        .text-primary\/70 { color: rgba(76, 29, 149, 0.7); }
-        .text-primary\/60 { color: rgba(76, 29, 149, 0.6); }
         .font-sans { font-family: var(--font-jp); }
         .min-h-screen { min-height: 100vh; }
 
-        /* ====================== 导航栏（与 Saturn 一致）====================== */
+        /* ====================== 导航栏 ====================== */
         nav {
             display: flex;
             justify-content: center;
@@ -150,6 +142,36 @@
             color: var(--secondary);
             max-width: 600px;
             margin: 0 auto;
+        }
+
+        /* ====================== 新增：图片区域 ====================== */
+        .hero-image {
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.03);
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 60%, rgba(79, 29, 149, 0.05));
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* ====================== 表单区域 ====================== */
@@ -304,7 +326,6 @@
             color: var(--primary);
         }
 
-        /* 错误信息 */
         .error {
             color: #dc2626;
             text-align: center;
@@ -338,28 +359,18 @@
             color: var(--primary);
         }
 
-        /* ====================== 响应式优化 ====================== */
         @media (max-width: 640px) {
-            header h1 {
-                font-size: 2rem;
-            }
-            form {
-                padding: 1.5rem;
-                margin: 2rem 1rem;
-            }
-            .result {
-                padding: 1.5rem;
-                margin: 2rem 1rem;
-            }
-            .result h2 {
-                font-size: 1.5rem;
-            }
+            header h1 { font-size: 2rem; }
+            form { padding: 1.5rem; margin: 2rem 1rem; }
+            .result { padding: 1.5rem; margin: 2rem 1rem; }
+            .result h2 { font-size: 1.5rem; }
+            .hero-image { margin: 1.5rem auto; }
         }
     </style>
 </head>
 <body class="bg-light font-sans text-primary min-h-screen">
 
-    <!-- 导航栏（与 Saturn 页面一致） -->
+    <!-- 导航栏 -->
     <nav>
         <a href="https://www.yourluckycompass.com">Home</a>
         <a href="https://www.yourluckycompass.com/bazi">Lucky Cosmic Blueprint</a>
@@ -376,6 +387,11 @@
         <h1>Five Elements Diet</h1>
         <p>Nourish your body and soul with our personalized seasonal diet based on your Five Elements type.</p>
     </header>
+
+    <!-- 新增：精美图片 -->
+    <div class="hero-image" style="position: relative;">
+        <img src="/static/images/diet-hero.jpg" alt="Seasonal foods and Five Elements harmony">
+    </div>
 
     <!-- 主内容 -->
     <main style="max-width: 1200px; margin: 0 auto; padding: 0 1rem 5rem;">
@@ -402,7 +418,13 @@
                 </select>
             </div>
             <p>
-                Not sure about your element? <a href="/bazi" class="text-accent1" style="text-decoration: underline;">Discover your Bazi Chart</a> first!
+                Not sure about your element? 
+                <a href="https://www.yourluckycompass.com/bazi" 
+                   class="text-accent1" 
+                   style="text-decoration: underline;" 
+                   target="_blank">
+                   Discover your Bazi Chart first!
+                </a>
             </p>
             <button type="submit">Get My Diet Plan</button>
         </form>
