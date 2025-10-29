@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, Flask
 import json
+import os  # 添加，用于检查文件存在
 
 diet = Blueprint('diet', __name__)
 
-# 食物名称到博客ID的映射
+# 食物名称到博客ID的映射（保持不变）
 food_to_blog_id = {
     "Adzuki Beans": 9,
     "Almond Milk": 10,
@@ -127,10 +128,16 @@ food_to_blog_id = {
     "Zucchini": 128
 }
 
-# 加载 diet.json
-with open('data/diet.json', 'r', encoding='utf-8') as f:
-    diet_data = json.load(f)
+# 加载 diet.json（添加错误处理）
+json_path = 'data/diet.json'
+if os.path.exists(json_path):
+    with open(json_path, 'r', encoding='utf-8') as f:
+        diet_data = json.load(f)
+else:
+    diet_data = {}  # 备用空数据，避免崩溃
+    print(f"Warning: {json_path} not found")  # Vercel 日志可见
 
+# Blueprint 路由（保持不变）
 @diet.route('/five-elements-diet', methods=['GET', 'POST'])
 def five_elements_diet():
     result = None
@@ -139,7 +146,7 @@ def five_elements_diet():
         season = request.form.get('season')
         
         # 查找对应季节和体质的食物
-        for s in diet_data['seasons']:
+        for s in diet_data.get('seasons', []):
             if s['name'] == season:
                 for t in s['types']:
                     if t['element'] == element:
@@ -158,7 +165,16 @@ def five_elements_diet():
     
     return render_template('diet.html', result=result, food_to_blog_id=food_to_blog_id)
 
-if __name__ == '__main__':
-    app = Flask(__name__)
-    app.register_blueprint(diet)
-    app.run(debug=True)
+# 创建全局 app 实例（Vercel 需要这个）
+app = Flask(__name__)
+app.register_blueprint(diet)
+
+# 添加根路由（显示初始表单）
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('diet.html', result=None, food_to_blog_id=food_to_blog_id)
+
+# 可选：如果想让 /five-elements-diet 作为默认，重定向根到它
+@app.route('/five-elements-diet', methods=['GET'])
+def redirect_to_diet():
+    return render_template('diet.html', result=None, food_to_blog_id=food_to_blog_id)
