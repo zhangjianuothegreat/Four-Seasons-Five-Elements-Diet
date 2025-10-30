@@ -16,6 +16,10 @@
       "dest": "/static/$1"
     },
     {
+      "src": "/googlef6415480ddc16fef.html",
+      "dest": "googlef6415480ddc16fef.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "diet.py"
     }
