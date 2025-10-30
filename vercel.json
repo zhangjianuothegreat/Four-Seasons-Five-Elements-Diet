@@ -12,6 +12,11 @@
       "dest": "/static/$1"
     },
     {
+      "src": "/googlef6415480ddc16fef.html",
+      "dest": "/public/googlef6415480ddc16fef.html",
+      "continue": false
+    },
+    {
       "src": "/(.*)",
       "dest": "/diet.py"
     }
